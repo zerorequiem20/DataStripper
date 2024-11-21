@@ -81,6 +81,7 @@ public class adm_data_stripper extends JFrame {
 
     public static void removeEmptyElements(Element element) {
         NodeList children = element.getChildNodes();
+        int xyz=5;
         for (int i = 0; i < children.getLength(); i++) {
             // Get the current node
             Node child = children.item(i);
