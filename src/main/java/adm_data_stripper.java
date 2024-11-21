@@ -106,6 +106,7 @@ public class adm_data_stripper extends JFrame {
         }
     }
 //comment
+    //comment2
     public String formatXML(Document doc) throws TransformerException {
         // Create a transformer to pretty-print the XML
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
