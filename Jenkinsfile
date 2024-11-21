@@ -1,27 +1,46 @@
 pipeline {
     agent any
 
+    environment {
+        // Define environment variables if necessary
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                // Checkout the code from the Git repository
-                git 'https://github.com/zerorequiem20/DataStripper.git'
+                script {
+                    // Add the build commands here
+                    echo 'Building the project...'
+                    sh 'mvn clean install'  // Example for Maven
+                }
             }
         }
 
-        stage('Build and Test') {
+        stage('Test') {
             steps {
                 script {
-                    // Run Maven build (this will compile and run tests)
-                    sh 'mvn clean install'
+                    // Add test commands here
+                    echo 'Running tests...'
+                    sh 'mvn test'  // Example for running unit tests with Maven
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                // Add steps for deploying the app if needed
+                script {
+                    // Add deploy commands here
+                    echo 'Deploying the application...'
+                    // Example deployment command (e.g., to an EC2 instance)
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            // Post-build actions such as cleanup
+            echo 'This will always run'
         }
     }
 }
