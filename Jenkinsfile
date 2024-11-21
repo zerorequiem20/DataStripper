@@ -1,46 +1,32 @@
 pipeline {
     agent any
 
-    environment {
-        // Define environment variables if necessary
-    }
-
     stages {
         stage('Build') {
             steps {
-                script {
-                    // Add the build commands here
-                    echo 'Building the project...'
-                    sh 'mvn clean install'  // Example for Maven
-                }
+                echo 'Building the project...'
+                sh 'mvn clean install'
             }
         }
 
         stage('Test') {
             steps {
-                script {
-                    // Add test commands here
-                    echo 'Running tests...'
-                    sh 'mvn test'  // Example for running unit tests with Maven
-                }
+                echo 'Running tests...'
+                sh 'mvn test'
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
-                    // Add deploy commands here
-                    echo 'Deploying the application...'
-                    // Example deployment command (e.g., to an EC2 instance)
-                }
+                echo 'Deploying the application...'
+                // Add your deploy steps here
             }
         }
     }
 
     post {
         always {
-            // Post-build actions such as cleanup
-            echo 'This will always run'
+            echo 'Pipeline finished!'
         }
     }
 }
