@@ -78,7 +78,7 @@ public class adm_data_stripper extends JFrame {
             writer.write(content);
         }
     }
-
+//c
     public static void removeEmptyElements(Element element) {
         NodeList children = element.getChildNodes();
         int xyz=5;
