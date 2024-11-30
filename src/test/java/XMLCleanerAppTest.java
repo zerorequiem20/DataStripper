@@ -19,7 +19,7 @@ public class XMLCleanerAppTest {
 
     @Test
     public void testRemoveEmptyElements() {
-        // Prepare a sample XML documentd
+        // Prepare a sample XML documentdd
         String xml = "<root><emptyElement /><nonEmptyElement>Data</nonEmptyElement><emptyText></emptyText></root>";
 
         try {
