@@ -29,7 +29,7 @@ public class adm_data_stripper_GUI extends JFrame {
 
         add(uploadButton);
     }
-
+//c
     public void uploadAndProcessFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select XML File");
