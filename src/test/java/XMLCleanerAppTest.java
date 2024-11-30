@@ -3,13 +3,7 @@ import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.*;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class XMLCleanerAppTest {
@@ -18,16 +12,16 @@ public class XMLCleanerAppTest {
 
     @BeforeEach
     public void setUp() {
-        admDataStripper = new adm_data_stripper(); // Only test the business logic methods
+        admDataStripper = new adm_data_stripper();
     }
 
     @Test
     public void testRemoveEmptyElements() throws Exception {
-        // Sample XML string with empty elements
+        // Prepare a sample XML string
         String xml = "<root>" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" />" +
+                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA08\" RGROUP=\"0001\" />" +
                 "<RWDATA_HEADERS />" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" />" +
+                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA09\" RGROUP=\"0001\" />" +
                 "<RWDATA_TEMPLATE />" +
                 "<WS_FUNC_ACCESS_GROUP />" +
                 "</root>";
@@ -38,33 +32,30 @@ public class XMLCleanerAppTest {
         InputSource is = new InputSource(new StringReader(xml));
         Document doc = builder.parse(is);
 
-        // Get the root element and remove empty elements
+        // Get root element
         Element root = doc.getDocumentElement();
-        adm_data_stripper.removeEmptyElements(root);
+
+        // Remove empty elements
+        admDataStripper.removeEmptyElements(root);
 
         // Convert the cleaned document to string
-        StringWriter writer = new StringWriter();
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.transform(new DOMSource(doc), new StreamResult(writer));
-        String cleanedXML = writer.toString();
+        String cleanedXML = admDataStripper.formatXML(doc);
 
-        // Assert that empty elements are removed
+        // Verify that the empty tags were removed
         assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
         assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
-        assertFalse(cleanedXML.contains("<RWDATA_HEADERS"));
-        assertFalse(cleanedXML.contains("<RWDATA_TEMPLATE"));
-        assertFalse(cleanedXML.contains("<WS_FUNC_ACCESS_GROUP"));
+        assertFalse(cleanedXML.contains("<RWDATA_HEADERS />"));
+        assertFalse(cleanedXML.contains("<RWDATA_TEMPLATE />"));
+        assertFalse(cleanedXML.contains("<WS_FUNC_ACCESS_GROUP />"));
     }
 
     @Test
     public void testCleanXMLContent() throws Exception {
-        // Sample XML string with empty elements
+        // Prepare a sample XML with some empty elements
         String xml = "<root>" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" />" +
+                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA08\" RGROUP=\"0001\" />" +
                 "<RWDATA_HEADERS />" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" />" +
+                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA09\" RGROUP=\"0001\" />" +
                 "<RWDATA_TEMPLATE />" +
                 "<WS_FUNC_ACCESS_GROUP />" +
                 "</root>";
@@ -72,18 +63,21 @@ public class XMLCleanerAppTest {
         // Clean the XML content
         String cleanedXML = admDataStripper.cleanXMLContent(xml);
 
-        // Assert that empty elements are removed
+        // Verify that the empty elements were removed
         assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
         assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
-        assertFalse(cleanedXML.contains("<RWDATA_HEADERS"));
-        assertFalse(cleanedXML.contains("<RWDATA_TEMPLATE"));
-        assertFalse(cleanedXML.contains("<WS_FUNC_ACCESS_GROUP"));
+        assertFalse(cleanedXML.contains("<RWDATA_HEADERS />"));
+        assertFalse(cleanedXML.contains("<RWDATA_TEMPLATE />"));
+        assertFalse(cleanedXML.contains("<WS_FUNC_ACCESS_GROUP />"));
     }
 
     @Test
     public void testFormatXML() throws Exception {
-        // Sample unformatted XML string
-        String xml = "<root><MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" /><MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" /></root>";
+        // Prepare a simple XML document
+        String xml = "<root>" +
+                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA08\" RGROUP=\"0001\" />" +
+                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA09\" RGROUP=\"0001\" />" +
+                "</root>";
 
         // Parse the XML string into a Document
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -91,10 +85,10 @@ public class XMLCleanerAppTest {
         InputSource is = new InputSource(new StringReader(xml));
         Document doc = builder.parse(is);
 
-        // Format the XML
+        // Format the XML using the formatXML method
         String formattedXML = admDataStripper.formatXML(doc);
 
-        // Assert that the formatted XML has indentation
+        // Check if the formatted XML has indentation
         assertTrue(formattedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
         assertTrue(formattedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
         assertTrue(formattedXML.contains("  <MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
@@ -103,7 +97,7 @@ public class XMLCleanerAppTest {
 
     @Test
     public void testEmptyXML() throws Exception {
-        // Sample XML with only empty elements
+        // Prepare an XML string with only empty elements
         String xml = "<root>" +
                 "<RWDATA_HEADERS />" +
                 "<RWDATA_TEMPLATE />" +
@@ -113,10 +107,16 @@ public class XMLCleanerAppTest {
         // Clean the XML content
         String cleanedXML = admDataStripper.cleanXMLContent(xml);
 
-        // Expected cleaned XML
-        String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<root/>\n";
+        // Expected cleaned XML (normalized line breaks)
+        String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<root/>\n";
 
-        // Assert that all empty elements are removed
-        assertEquals(expectedXML.replaceAll("\r\n", "\n"), cleanedXML.replaceAll("\r\n", "\n"));
+        // Normalize line breaks in both actual and expected output
+        cleanedXML = cleanedXML.replaceAll("\r\n", "\n"); // Normalize CRLF to LF (Windows-style to Unix-style)
+        expectedXML = expectedXML.replaceAll("\r\n", "\n");
+
+        // Verify that all empty elements were removed
+        assertEquals(expectedXML, cleanedXML);
     }
+
 }
