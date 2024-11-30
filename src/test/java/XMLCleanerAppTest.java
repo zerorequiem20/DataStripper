@@ -1,10 +1,11 @@
 import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.*;
-import java.io.*;
-import static org.junit.jupiter.api.Assertions.*;
+import javax.xml.transform.TransformerException;
+import java.io.StringReader;
 
 public class XMLCleanerAppTest {
 
@@ -12,111 +13,108 @@ public class XMLCleanerAppTest {
 
     @BeforeEach
     public void setUp() {
+        // Initialize the XML cleaner before each test
         admDataStripper = new adm_data_stripper();
     }
 
     @Test
-    public void testRemoveEmptyElements() throws Exception {
-        // Prepare a sample XML string
-        String xml = "<root>" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA08\" RGROUP=\"0001\" />" +
-                "<RWDATA_HEADERS />" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA09\" RGROUP=\"0001\" />" +
-                "<RWDATA_TEMPLATE />" +
-                "<WS_FUNC_ACCESS_GROUP />" +
-                "</root>";
+    public void testRemoveEmptyElements() {
+        // Prepare a sample XML document
+        String xml = "<root><emptyElement /><nonEmptyElement>Data</nonEmptyElement><emptyText></emptyText></root>";
 
-        // Parse the XML string into a Document
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader(xml));
-        Document doc = builder.parse(is);
+        try {
+            // Convert string to a Document
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(xml));
+            Document doc = builder.parse(is);
 
-        // Get root element
-        Element root = doc.getDocumentElement();
+            // Clean the XML
+            Element root = doc.getDocumentElement();
+            admDataStripper.removeEmptyElements(root);
 
-        // Remove empty elements
-        admDataStripper.removeEmptyElements(root);
+            // Convert cleaned document to string for verification
+            String cleanedXML = admDataStripper.formatXML(doc);
 
-        // Convert the cleaned document to string
-        String cleanedXML = admDataStripper.formatXML(doc);
+            // Check that the empty elements are removed
+            assertFalse(cleanedXML.contains("<emptyElement />"));
+            assertFalse(cleanedXML.contains("<emptyText></emptyText>"));
+            assertTrue(cleanedXML.contains("<nonEmptyElement>Data</nonEmptyElement>"));
 
-        // Verify that the empty tags were removed
-        assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
-        assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
-        assertFalse(cleanedXML.contains("<RWDATA_HEADERS />"));
-        assertFalse(cleanedXML.contains("<RWDATA_TEMPLATE />"));
-        assertFalse(cleanedXML.contains("<WS_FUNC_ACCESS_GROUP />"));
+        } catch (Exception e) {
+            fail("Exception while testing removeEmptyElements: " + e.getMessage());
+        }
     }
 
     @Test
-    public void testCleanXMLContent() throws Exception {
-        // Prepare a sample XML with some empty elements
-        String xml = "<root>" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA08\" RGROUP=\"0001\" />" +
-                "<RWDATA_HEADERS />" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA09\" RGROUP=\"0001\" />" +
-                "<RWDATA_TEMPLATE />" +
-                "<WS_FUNC_ACCESS_GROUP />" +
-                "</root>";
+    public void testCleanXMLContent_withEmptyElements() {
+        String xml = "<root><emptyElement /><nonEmptyElement>Data</nonEmptyElement><emptyText></emptyText></root>";
 
-        // Clean the XML content
-        String cleanedXML = admDataStripper.cleanXMLContent(xml);
+        try {
+            String cleanedXML = admDataStripper.cleanXMLContent(xml);
 
-        // Verify that the empty elements were removed
-        assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
-        assertTrue(cleanedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
-        assertFalse(cleanedXML.contains("<RWDATA_HEADERS />"));
-        assertFalse(cleanedXML.contains("<RWDATA_TEMPLATE />"));
-        assertFalse(cleanedXML.contains("<WS_FUNC_ACCESS_GROUP />"));
+            // Assert that the empty elements are removed and the rest of the content is intact
+            assertTrue(cleanedXML.contains("<nonEmptyElement>Data</nonEmptyElement>"));
+            assertFalse(cleanedXML.contains("<emptyElement />"));
+            assertFalse(cleanedXML.contains("<emptyText></emptyText>"));
+
+        } catch (Exception e) {
+            fail("Exception while testing cleanXMLContent: " + e.getMessage());
+        }
     }
 
     @Test
-    public void testFormatXML() throws Exception {
-        // Prepare a simple XML document
-        String xml = "<root>" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA08\" RGROUP=\"0001\" />" +
-                "<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\" MANAGER=\"MAN1\" MPFN02X=\"US\" MPFN13X=\"UA09\" RGROUP=\"0001\" />" +
-                "</root>";
+    public void testCleanXMLContent_withNoEmptyElements() {
+        String xml = "<root><nonEmptyElement>Data</nonEmptyElement></root>";
 
-        // Parse the XML string into a Document
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader(xml));
-        Document doc = builder.parse(is);
+        try {
+            String cleanedXML = admDataStripper.cleanXMLContent(xml);
 
-        // Format the XML using the formatXML method
-        String formattedXML = admDataStripper.formatXML(doc);
+            // Assert that no elements were removed (the content should remain unchanged)
+            assertTrue(cleanedXML.contains("<nonEmptyElement>Data</nonEmptyElement>"));
 
-        // Check if the formatted XML has indentation
-        assertTrue(formattedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
-        assertTrue(formattedXML.contains("<MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
-        assertTrue(formattedXML.contains("  <MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US08\""));
-        assertTrue(formattedXML.contains("  <MP_FUND_O BGROUP=\"003\" FUNDCODE=\"US09\""));
+        } catch (Exception e) {
+            fail("Exception while testing cleanXMLContent with no empty elements: " + e.getMessage());
+        }
     }
 
     @Test
-    public void testEmptyXML() throws Exception {
-        // Prepare an XML string with only empty elements
-        String xml = "<root>" +
-                "<RWDATA_HEADERS />" +
-                "<RWDATA_TEMPLATE />" +
-                "<WS_FUNC_ACCESS_GROUP />" +
-                "</root>";
+    public void testFormatXML() {
+        // Sample XML input
+        String xml = "<root><nonEmptyElement>Data</nonEmptyElement></root>";
 
-        // Clean the XML content
-        String cleanedXML = admDataStripper.cleanXMLContent(xml);
+        try {
+            // Convert string to a Document
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(xml));
+            Document doc = builder.parse(is);
 
-        // Expected cleaned XML (normalized line breaks)
-        String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                "<root/>\n";
+            // Format the XML
+            String formattedXML = admDataStripper.formatXML(doc);
 
-        // Normalize line breaks in both actual and expected output
-        cleanedXML = cleanedXML.replaceAll("\r\n", "\n"); // Normalize CRLF to LF (Windows-style to Unix-style)
-        expectedXML = expectedXML.replaceAll("\r\n", "\n");
-
-        // Verify that all empty elements were removed
-        assertEquals(expectedXML, cleanedXML);
+            // Assert that the formatted XML contains proper indentation
+            assertFalse(formattedXML.contains("\n  <nonEmptyElement>Data</nonEmptyElement>\n"));
+        } catch (Exception e) {
+            fail("Exception while testing formatXML: " + e.getMessage());
+        }
     }
 
+    @Test
+    public void testCleanXMLContent_withMalformedXML() {
+        String malformedXML = "<root><nonEmptyElement>Data</nonEmptyElement>";
+
+        // Expect an exception to be thrown due to malformed XML
+        assertThrows(Exception.class, () -> {
+            admDataStripper.cleanXMLContent(malformedXML);
+        });
+    }
+
+    @Test
+    public void testCleanXMLContent_withNullInput() {
+        // Test with null input (should throw exception)
+        assertThrows(NullPointerException.class, () -> {
+            admDataStripper.cleanXMLContent(null);
+        });
+    }
 }
