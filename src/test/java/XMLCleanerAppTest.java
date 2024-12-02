@@ -45,7 +45,7 @@ public class XMLCleanerAppTest {
             fail("Exception while testing removeEmptyElements: " + e.getMessage());
         }
     }
-//hi
+//hids
     @Test
     public void testCleanXMLContent_withEmptyElements() {
         String xml = "<root><emptyElement /><nonEmptyElement>Data</nonEmptyElement><emptyText></emptyText></root>";
