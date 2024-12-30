@@ -20,6 +20,9 @@ RUN mvn dependency:go-offline
 # Step 2: Compile and package the application
 RUN mvn clean install -DskipTests
 
+# Verify the JAR file creation in the target directory
+RUN ls -la /app/target
+
 # Step 3: Run Stage (using a smaller JDK 17 image for runtime)
 # Use OpenJDK 17 Slim base image for runtime
 FROM openjdk:17-jdk-slim
