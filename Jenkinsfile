@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'datastripper'  // Your Docker image name
         DOCKER_TAG = 'v1.0'    // You can replace 'latest' with any version tag
-        GIT_REPO = 'https://github.com/zerorequiem20/DataStripper.git' // GitHub Repo URL
     }
 
     stages {
