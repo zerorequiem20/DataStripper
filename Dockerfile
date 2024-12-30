@@ -1,6 +1,6 @@
 # Step 1: Build Stage (using Maven)
 # Use an official Maven image with OpenJDK 17
-FROM maven:3.8.6-openjdk-17-buster AS build
+FROM maven:3.8.6-openjdk-17 AS build
 
 # Set working directory in the container
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY . /app/
 RUN mvn clean install -DskipTests
 
 # Step 3: Run Stage (using a smaller JDK 17 image for the runtime)
-# Use a slim OpenJDK 17 image to reduce image size
+# Use OpenJDK 17 JDK image to reduce image size
 FROM openjdk:17-jdk-slim
 
 # Set working directory in the container
