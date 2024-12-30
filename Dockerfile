@@ -1,6 +1,6 @@
 # Step 1: Build Stage (using Maven)
 # Use an official Maven image with OpenJDK 17
-FROM maven:3.8.6-openjdk-17-slim AS build
+FROM maven:3.8.6-openjdk-17 AS build
 
 # Set working directory in the container
 WORKDIR /app
