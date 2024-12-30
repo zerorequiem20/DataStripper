@@ -4,13 +4,19 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'datastripper'  // Your Docker image name
         DOCKER_TAG = 'v1.0'    // You can replace 'latest' with any version tag
+        GIT_REPO = 'https://github.com/zerorequiem20/DataStripper.git' // GitHub Repo URL
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the repository from GitHub
-                git url: "${GIT_REPO}"
+                script {
+                    // Clone the repository from GitHub, explicitly specifying the branch
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: 'refs/heads/main']],
+                              userRemoteConfigs: [[url: "${GIT_REPO}"]]
+                    ])
+                }
             }
         }
 
@@ -27,7 +33,6 @@ pipeline {
             steps {
                 script {
                     // Test the Docker image by running it and ensuring it works
-                    // Adjust this if your app needs additional testing steps
                     docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").inside {
                         sh 'mvn test'  // Run tests inside the container
                     }
