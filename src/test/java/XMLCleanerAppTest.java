@@ -94,7 +94,7 @@ public class XMLCleanerAppTest {
             String formattedXML = admDataStripper.formatXML(doc);
 
             // Assert that the formatted XML contains proper indentation
-            assertFalse(formattedXML.contains("\n  <nonEmptyElement>Data</nonEmptyElement>\n"));
+            assertTrue(formattedXML.contains("\n  <nonEmptyElement>Data</nonEmptyElement>\n"));
         } catch (Exception e) {
             fail("Exception while testing formatXML: " + e.getMessage());
         }
