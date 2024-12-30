@@ -32,7 +32,7 @@ public class adm_data_stripper {
             }
         }
     }
-    //heiu3heweaaa
+    //heiu3heweaaaef
 
     public String formatXML(Document doc) throws TransformerException {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
