@@ -2,20 +2,20 @@
 # Use OpenJDK 17 Slim image for build stage
 FROM openjdk:17-jdk-slim AS build
 
-# Install Maven (since it's not included in the OpenJDK image)
+# Install Git and Maven (since they are not included in the OpenJDK image)
 RUN apt-get update && \
-    apt-get install -y maven && \
+    apt-get install -y git maven && \
     apt-get clean
 
 # Set working directory in the container
 WORKDIR /app
 
-# Copy the Maven POM file and download the dependencies
-COPY pom.xml /app/
-RUN mvn dependency:go-offline
+# Clone the repository from GitHub
+# Replace <username>/<repo> with your actual GitHub username and repository name
+RUN git clone https://github.com/zerorequiem20/DataStripper .
 
-# Copy the entire project (including source code and resources) to the container
-COPY . /app/
+# Download Maven dependencies
+RUN mvn dependency:go-offline
 
 # Step 2: Compile and package the application
 RUN mvn clean install -DskipTests
