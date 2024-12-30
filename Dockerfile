@@ -1,6 +1,6 @@
 # Step 1: Build Stage (using Maven)
-# Use an official Maven image with OpenJDK 17 (Oracle version)
-FROM maven:3.8.6-openjdk-17-oracle AS build
+# Use an official OpenJDK 17 with Oracle JDK base image and Maven installed
+FROM openjdk:17.0-jdk-oracle AS build
 
 # Set working directory in the container
 WORKDIR /app
@@ -15,8 +15,9 @@ COPY . /app/
 # Step 2: Compile and package the application
 RUN mvn clean install -DskipTests
 
-# Step 3: Run Stage (using Oracle JDK 17 image for the runtime)
-FROM openjdk:17-oracle
+# Step 3: Run Stage (using a smaller JDK 17 image for the runtime)
+# Use a slim OpenJDK 17 Oracle image for runtime
+FROM openjdk:17.0-jdk-oracle
 
 # Set working directory in the container
 WORKDIR /app
