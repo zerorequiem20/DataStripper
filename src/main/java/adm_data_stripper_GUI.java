@@ -12,24 +12,44 @@ public class adm_data_stripper_GUI extends JFrame {
         xmlProcessor = new adm_data_stripper();
 
         // Setup the frame
-        setTitle("XML Cleaner");
-        setSize(400, 200);
+        setTitle("XML Cleaner - Optimise Your Data");
+        setSize(450, 220);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the window
 
-        // Set the layout and add components
-        setLayout(new FlowLayout());
+        // Set layout and panel structure
+        setLayout(new BorderLayout());
 
-        // Upload button
+        // Title panel
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        JLabel title = new JLabel("XML Cleaner", SwingConstants.CENTER);
+        JLabel subtitle = new JLabel("Clean and optimise your XML files", SwingConstants.CENTER);
+        title.setFont(new Font("SansSerif", Font.BOLD, 18));
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titlePanel.add(Box.createVerticalStrut(15));
+        titlePanel.add(title);
+        titlePanel.add(subtitle);
+        titlePanel.add(Box.createVerticalStrut(10));
+
+        // Button panel
+        JPanel buttonPanel = new JPanel();
         uploadButton = new JButton("Upload and Clean XML");
+        uploadButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        uploadButton.setPreferredSize(new Dimension(200, 40));
         uploadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 uploadAndProcessFile();
             }
         });
+        buttonPanel.add(uploadButton);
 
-        add(uploadButton);
+        // Combine panels
+        add(titlePanel, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.CENTER);
     }
-
     public void uploadAndProcessFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select XML File");
