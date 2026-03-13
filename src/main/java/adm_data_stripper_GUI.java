@@ -77,6 +77,7 @@ public class adm_data_stripper_GUI extends JFrame {
         }
     }
 
+    //test
     public String readFile(File file) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
