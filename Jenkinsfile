@@ -32,7 +32,7 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    // Test the Docker image by running it and ensuring it works
+                    // Test the Docker image by running it and ensuring it works.
                     docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").inside {
                         sh 'mvn test'  // Run tests inside the container
                     }

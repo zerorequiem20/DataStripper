@@ -7,7 +7,7 @@ RUN apt-get update && \
     apt-get install -y git maven && \
     apt-get clean
 
-# Set working directory in the container
+# Set working directory in the container.
 WORKDIR /app
 
 # Clone the repository from GitHub
