@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         APP_JAR = 'adm-data-stripper-1.0-SNAPSHOT.jar'  // Name of the built JAR
-        DOCKER_USER = 'ubuntu'                           // SSH user for Docker EC2
+        DOCKER_USER = 'ubuntu'                           // Docker EC2 username
         DOCKER_HOST = '13.48.6.128'                     // Docker EC2 public IP
-        DOCKER_DIR = '~/docker-app'                     // Directory on Docker EC2
-        DOCKER_IMAGE = 'myapp:latest'                  // Docker image name
+        DOCKER_DIR = '~/docker-app'                      // Directory on Docker EC2
+        DOCKER_IMAGE = 'myapp:latest'                   // Docker image name
     }
 
     stages {
@@ -38,13 +38,13 @@ pipeline {
         stage('Deploy to Docker Host') {
             steps {
                 sshagent(credentials: ['docker-ssh-key']) {
-                    // Make sure Docker directory exists
+                    // Make sure Docker directory exists on the remote
                     sh "ssh -o StrictHostKeyChecking=no ${DOCKER_USER}@${DOCKER_HOST} 'mkdir -p ${DOCKER_DIR}'"
 
-                    // Copy JAR to Docker host
-                    sh "scp -o StrictHostKeyChecking=no target/${APP_JAR} ${DOCKER_USER}@${DOCKER_HOST}:${DOCKER_DIR}/"
+                    // Copy both JAR and Dockerfile to remote Docker host
+                    sh "scp -o StrictHostKeyChecking=no target/${APP_JAR} Dockerfile ${DOCKER_USER}@${DOCKER_HOST}:${DOCKER_DIR}/"
 
-                    // Build Docker image, stop & remove old container, and run new one
+                    // Build Docker image, stop & remove old container, run new container
                     sh """
                     ssh -o StrictHostKeyChecking=no ${DOCKER_USER}@${DOCKER_HOST} '
                         docker build -t ${DOCKER_IMAGE} ${DOCKER_DIR} &&
