@@ -11,7 +11,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                sh 'mvn clean package'
             }
         }
 
@@ -23,7 +23,8 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                // Only look in the top-level target folder
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
 
