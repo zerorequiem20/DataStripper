@@ -50,6 +50,7 @@ public class adm_data_stripper_GUI extends JFrame {
         add(titlePanel, BorderLayout.NORTH);
         add(buttonPanel, BorderLayout.CENTER);
     }
+    //testing cicd
     public void uploadAndProcessFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select XML File");
