@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        APP_JAR = 'adm-data-stripper-1.0-SNAPSHOT.jar'  // Name of the built JAR
+        DOCKER_HOST = 'ubuntu@13.48.6.128'              // Docker EC2
+        DOCKER_DIR = '~/docker-app'                     // Directory on Docker EC2
+        DOCKER_IMAGE = 'myapp:latest'                  // Docker image name
+    }
+
     stages {
 
         stage('Checkout Code') {
@@ -23,20 +30,40 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                // Only look in the top-level target folder
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                archiveArtifacts artifacts: "target/${APP_JAR}", fingerprint: true
             }
         }
 
+        stage('Deploy to Docker Host') {
+            steps {
+                sshagent(credentials: ['docker-ssh-key']) {
+                    // Make sure Docker directory exists
+                    sh "ssh ${DOCKER_HOST} 'mkdir -p ${DOCKER_DIR}'"
+
+                    // Copy JAR to Docker host
+                    sh "scp target/${APP_JAR} ${DOCKER_HOST}:${DOCKER_DIR}/"
+
+                    // Build Docker image, stop & remove old container, and run new one
+                    sh """
+                    ssh ${DOCKER_HOST} '
+                        docker build -t ${DOCKER_IMAGE} ${DOCKER_DIR} &&
+                        docker stop myapp || true &&
+                        docker rm myapp || true &&
+                        docker run -d --name myapp -p 8080:8080 ${DOCKER_IMAGE}
+                    '
+                    """
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'Build and tests successful!'
+            echo 'Build, tests, and deployment successful!'
         }
 
         failure {
-            echo 'Build or tests failed.'
+            echo 'Pipeline failed at some stage.'
         }
 
         always {
