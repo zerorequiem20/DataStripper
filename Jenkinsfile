@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_JAR = 'adm-data-stripper-1.0-SNAPSHOT.jar'  // Name of the built JAR
         DOCKER_USER = 'ubuntu'                           // Docker EC2 username
-        DOCKER_HOST = '13.48.6.128'                     // Docker EC2 public IP
+        DOCKER_HOST = '13.49.89.11'                     // Docker EC2 public IP
         DOCKER_DIR = '~/docker-app'                      // Directory on Docker EC2
         DOCKER_IMAGE = 'myapp:latest'                   // Docker image name
     }
