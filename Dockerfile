@@ -1,6 +1,6 @@
 # ===== Runtime-only Dockerfile for your app =====
-# Use OpenJDK 17 slim for a small runtime image
-FROM openjdk:17-jdk-slim
+# Use official OpenJDK 17 slim image
+FROM openjdk:17-slim
 
 # Set working directory inside container
 WORKDIR /app
