@@ -38,10 +38,10 @@ pipeline {
         stage('Deploy to Docker Host') {
             steps {
                 sshagent(credentials: ['docker-ssh-key']) {
-                    // Make sure Docker directory exists on the remote
+                    // ensure Docker directory exists on the remote
                     sh "ssh -o StrictHostKeyChecking=no ${DOCKER_USER}@${DOCKER_HOST} 'mkdir -p ${DOCKER_DIR}'"
 
-                    // Copy both JAR and Dockerfile to remote Docker host
+                    // Copy the JAR and Dockerfile to remote Docker host
                     sh "scp -o StrictHostKeyChecking=no target/${APP_JAR} Dockerfile ${DOCKER_USER}@${DOCKER_HOST}:${DOCKER_DIR}/"
 
                     // Build Docker image, stop & remove old container, run new container
