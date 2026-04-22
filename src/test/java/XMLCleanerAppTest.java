@@ -23,7 +23,7 @@ public class XMLCleanerAppTest {
         String xml = "<root><emptyElement /><nonEmptyElement>Data</nonEmptyElement><emptyText></emptyText></root>";
 
         try {
-            // Convert string to a Document
+            // Convert string to a Document2
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
