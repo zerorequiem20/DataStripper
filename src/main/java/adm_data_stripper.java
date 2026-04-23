@@ -44,6 +44,7 @@ public class adm_data_stripper {
 
         return writer.toString();
     }
+    //test
 
     public String cleanXMLContent(String xmlContent) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
